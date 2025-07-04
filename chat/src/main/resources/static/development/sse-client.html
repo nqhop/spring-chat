@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSE Client</title>
+</head>
+<body>
+<h1>Server-Sent Events</h1>
+<div id="events"></div>
+
+<script>
+    const eventSource = new EventSource('http://localhost:8081/sse/events');
+
+    // Handle messages with the "message" event name
+    eventSource.addEventListener('message', function(event) {
+        const eventDiv = document.getElementById('events');
+        eventDiv.innerHTML += `<p>ID: ${event.lastEventId}, Data: ${event.data}</p>`;
+    });
+
+    // Handle connection open
+    eventSource.onopen = function() {
+        console.log('SSE connection opened');
+    };
+
+    // Handle errors (e.g., connection closed or network error)
+    eventSource.onerror = function() {
+        console.log('SSE error occurred');
+        eventSource.close(); // Close the connection on error
+    };
+</script>
+</body>
+</html>

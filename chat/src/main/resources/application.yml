@@ -1,0 +1,24 @@
+nats:
+  url: nats://localhost:4222
+server:
+  port: 8081
+
+
+spring:
+  application:
+    name: chat
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/spring_chat
+    username: postgres
+    password: postgres123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true

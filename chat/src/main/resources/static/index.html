@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<h2>WebSocket Chat</h2>
+<input id="sender" placeholder="Your name" />
+<input id="message" placeholder="Enter message" />
+<button onclick="sendMessage()">Send</button>
+<ul id="messages"></ul>
+
+<script>
+    const socket = new SockJS('/greetings');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function () {
+        stompClient.subscribe('/topic/greetings', function (msg) {
+            const message = JSON.parse(msg.body);
+            const li = document.createElement("li");
+            li.innerText = `${message.sender}: ${message.content}`;
+            document.getElementById("messages").appendChild(li);
+        });
+    });
+
+    function sendMessage() {
+        const sender = document.getElementById("sender").value;
+        const content = document.getElementById("message").value;
+        stompClient.send("/app/greetings", {}, JSON.stringify({ sender, content }));
+    }
+
+</script>
+</body>
+</html>
