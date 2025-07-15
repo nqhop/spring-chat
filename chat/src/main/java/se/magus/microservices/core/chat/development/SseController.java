@@ -1,7 +1,9 @@
 package se.magus.microservices.core.chat.development;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -48,12 +50,15 @@ public class SseController {
         });
         return emitter;
     }
+
+
     /*
         Handling Multiple clients
+        curl http://localhost:8081/sse/events
      */
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
-    @GetMapping(path = "/subscribe/{clientId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+        @GetMapping(path = "/subscribe/{clientId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@PathVariable String clientId) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         emitters.put(clientId, emitter);
@@ -61,37 +66,28 @@ public class SseController {
         emitter.onCompletion(() -> emitters.remove(clientId));
         emitter.onTimeout(() -> emitters.remove(clientId));
         emitter.onError((e) -> emitters.remove(clientId));
-
         return emitter;
     }
-
 
     /*
-    http://localhost:8081/sse/subscribe0
+    curl -X POST http://localhost:8081/sse/broadcast \
+     -H "Content-Type: text/plain" \
+     -d "Hello from client"
      */
-    @GetMapping(path = "/subscribe0", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe0() {
-        String clientId = UUID.randomUUID().toString();
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-//        emitters.put(clientId, emitter);
-
-//        emitter.onCompletion(() -> emitters.remove(clientId));
-//        emitter.onTimeout(() -> emitters.remove(clientId));
-//        emitter.onError((e) -> emitters.remove(clientId));
-
-        return emitter;
-    }
-
     @PostMapping("/broadcast")
-    public void broadcast(@RequestBody String message) {
+    public ResponseEntity<String> broadcast(@RequestBody String message) {
+
         emitters.forEach((clientId, emitter) -> {
             try {
                 emitter.send(SseEmitter.event().name("message").data(message));
+                log.info("SSE event #####{}", clientId);
             } catch (IOException e) {
                 emitters.remove(clientId);
                 emitter.completeWithError(e);
             }
         });
+
+        return new ResponseEntity<>("Message sent to " + (emitters.size()) + " clients", HttpStatus.OK);
     }
 }
 
