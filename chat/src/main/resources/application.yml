@@ -22,3 +22,18 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+
+management:
+  server:
+    port: 8099
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+        - prometheus
+        - metrics

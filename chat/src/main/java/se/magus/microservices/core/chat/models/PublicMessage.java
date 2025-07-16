@@ -6,7 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.http.MediaType;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Builder
@@ -16,17 +20,23 @@ import java.util.UUID;
 @AllArgsConstructor
 @Table(
         name = "public_message")
-public class PublicMessage {
+public class PublicMessage extends TimeStampBase {
+
+    @Version
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT now()")
+    private Instant version;
 
 
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(updatable = false, nullable = false)
-    private UUID id;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private PublicChanel chanel;
+
+    @Column(length = 32, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MessageType messageType = MessageType.MESSAGE;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private User from;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
