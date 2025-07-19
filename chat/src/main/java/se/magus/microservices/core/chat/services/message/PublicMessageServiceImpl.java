@@ -30,7 +30,7 @@ public class PublicMessageServiceImpl implements PublicMessageService {
     @Override
     public void deliverMessage(PublicMessageDto message) {
         natsService.publish(
-                ChannelSubject.publicChannelSubject("channelId"), message
+                ChannelSubject.publicChannelSubject(message.getChannel().toString()), message
         );
     }
 }
