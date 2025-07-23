@@ -12,7 +12,7 @@ public class PublicMessageDto extends MessageDto {
                 message.getId(),
                 message.getVersion(),
                 message.getContent(),
-                message.getChanel().getId(),
+                message.getChannel().getId(),
                 message.getMessageType(),
                 message.getCreatedAt().toString(),
                 message.getCreatedAt().toString());

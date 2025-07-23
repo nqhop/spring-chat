@@ -25,14 +25,24 @@ public class PublicChannelController {
         this.channelService = channelService;
     }
 
+    /*
+        curl -POST http://localhost:8081/api/channel/public/publicMessage \
+        -H "Content-Type: application/json" \
+        -d '{"channelId": "c1d3a0d2-8e56-4b6f-b65a-93fcd2d1d70b", "message": "Hello world"}'
+     */
     @RequestMapping(path = "/publicMessage", method = RequestMethod.POST)
     public ResponseEntity<Object> publishMessage(@RequestBody PublicMessageRequest request) {
-        PublicMessageDto message = messageService.createMessage(
+        try {
+            PublicMessageDto message = messageService.createMessage(
                     "fromUserId", request.getChannelId(), request.getMessage()
-        );
-        log.info("=========PublicChannelController - Message published: {}", message);
-        messageService.deliverMessage(message);
-        return ResponseEntity.ok(message);
+            );
+            log.info("=========PublicChannelController - Message published: {}", message);
+            messageService.deliverMessage(message);
+            return ResponseEntity.ok(message);
+        }catch (ChannelDoesNotExist e){
+            return null;
+        }
+
     }
 
     @RequestMapping(path = "/subscribe", method = RequestMethod.GET)
