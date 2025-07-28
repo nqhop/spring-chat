@@ -32,6 +32,7 @@ public class PublicChannelController {
      */
     @RequestMapping(path = "/publicMessage", method = RequestMethod.POST)
     public ResponseEntity<Object> publishMessage(@RequestBody PublicMessageRequest request) {
+        log.info("publishMessage to channel Id :{}", request.getChannelId());
         try {
             PublicMessageDto message = messageService.createMessage(
                     "fromUserId", request.getChannelId(), request.getMessage()

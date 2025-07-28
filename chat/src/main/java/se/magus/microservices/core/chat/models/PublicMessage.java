@@ -36,4 +36,8 @@ public class PublicMessage extends TimeStampBase {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    public void setChannel(PublicChannel channel){
+        this.channel = channel;
+        channel.setMessages(this);
+    }
 }

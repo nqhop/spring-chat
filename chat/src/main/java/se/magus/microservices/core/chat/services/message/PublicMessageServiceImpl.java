@@ -1,5 +1,6 @@
 package se.magus.microservices.core.chat.services.message;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import se.magus.microservices.core.chat.data.message.PublicMessageDto;
 import se.magus.microservices.core.chat.exception.ChannelDoesNotExist;
@@ -12,6 +13,7 @@ import se.magus.microservices.core.chat.utils.ChannelSubject;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class PublicMessageServiceImpl implements PublicMessageService {
     private final NatsService natsService;
@@ -36,6 +38,7 @@ public class PublicMessageServiceImpl implements PublicMessageService {
     @Override
     public PublicMessageDto createMessage(String fromUserId, String channelId, String message) throws ChannelDoesNotExist {
         PublicChannel channel = getChannelById(channelId);
+        log.info("getChannelById for createMessage: " + channel.getName());
         PublicMessage publicMessage =
                 PublicMessage.builder()
                         .channel(channel)
